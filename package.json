@@ -2,7 +2,7 @@
   "name": "tswFinalProject",
   "version": "0.0.0",
   "description": "tswFinalProject ===============",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -15,5 +15,13 @@
   "bugs": {
     "url": "https://github.com/alexandder/tswFinalProject/issues"
   },
-  "homepage": "https://github.com/alexandder/tswFinalProject"
+  "dependencies": {
+    "express": "3.x",
+    "less-middleware": "^0.1.15"
+  },
+  "homepage": "https://github.com/alexandder/tswFinalProject",
+  "devDependencies": {
+    "grunt": "^0.4.4",
+    "grunt-bower-task": "^0.3.4"
+  }
 }
