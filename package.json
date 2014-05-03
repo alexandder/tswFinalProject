@@ -22,6 +22,8 @@
   "homepage": "https://github.com/alexandder/tswFinalProject",
   "devDependencies": {
     "grunt": "^0.4.4",
-    "grunt-bower-task": "^0.3.4"
+    "grunt-bower-task": "^0.3.4",
+    "express": "3.x",
+    "socket.io": "^0.9.16"
   }
 }
