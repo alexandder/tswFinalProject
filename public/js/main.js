@@ -9,6 +9,10 @@ app.controller('appController', ['$scope', 'socket',
 	function ($scope, socket) {
 	
 	$scope.users = [];	
+	$scope.gameStarted = false;
+	$scope.question = "";
+	$scope.userAnswer = "";
+
 
 	$scope.login = function () {
 		if ($scope.username !== null) {
@@ -18,11 +22,19 @@ app.controller('appController', ['$scope', 'socket',
 	};
 
 	$scope.logout = function () {
-		socket.emit('logout', $scope.username);
 		$scope.connected = false;
-		$scope.$digest();
+		socket.emit('logout', $scope.username);
 	};
 
+	$scope.startGame = function () {
+		$scope.gameStarted = true;
+		socket.emit('startGame');
+		$scope.digest;
+	};
+
+	$scope.tryAnswer = function () {
+
+	};
 	socket.on('updateUserList', function (data) {
 		$scope.users = data;
 		$scope.$digest();

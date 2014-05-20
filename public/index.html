@@ -28,10 +28,30 @@
 		</div>
 
 		<div id="userList" data-ng-show="connected">
-			<h3>User list</h3>
+			<h3>Standings</h3>
    			<table class="table">
-     		   <tr ng-repeat="user in users"><td>{{$index}}</td><td>{{user}}</td></tr>
+   				<tr>
+					<th>Position</th>
+					<th>User</th>
+					<th>Score</th>
+   				</tr>
+     		   <tr ng-repeat="user in users"><td>{{$index+1}}</td><td>{{user}}</td></tr>
   		    </table>
+		</div>
+
+		<div id="gameBox" ng-show="connected">
+			<form action="" ng-submit="startGame()" ng-hide="gameStarted">
+				<button type="submit" class="btn btn-primary">Start a game!</button>
+			</form> 
+			<div id="questionBox" ng-show="gameStarted">
+				<p>Kapital of {{question}} is... </p>
+				<form action="" ng-submit="tryAnswer()">
+				<input type="text" ng-model="userAnswer" >
+				<br>
+				<button type="submit" class="btn btn-primary">Answer!</button>
+				</form>
+				<p>Given answer: {{userAnswer}}</p>
+			</div>
 		</div>
 	</div>
 </body>

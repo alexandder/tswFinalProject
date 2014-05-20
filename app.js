@@ -13,6 +13,29 @@ app.use('/bower_components',  express.static(__dirname + '/bower_components'));
 
 var users = [];
 
+var questions = [
+	{
+		question: "France",
+		answer: "Paris"
+	},
+	{
+		question: "USA",
+		answer: "Washington"
+	},
+	{
+		question: "Poland",
+		answer: "Warsaw"
+	},
+	{
+		question: "Germany",
+		answer: "Berlin"
+	},
+	{
+		question: "Italy",
+		answer: "Rome"
+	}
+];
+
 io.sockets.on('connection', function (socket) {
 	socket.on('login', function (user) {
 		socket.user = user;
@@ -25,6 +48,10 @@ io.sockets.on('connection', function (socket) {
 		users = _.without(users, user);
 		console.log(users);
 		io.sockets.emit('updateUserList', users);
+	});
+
+	socket.on('startGame', function() {
+		console.log('Game started!');
 	});
 });
 

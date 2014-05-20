@@ -18,3 +18,12 @@
 	margin-left: 50px;
 	border: solid 1px black;
 }
+
+#gameBox {
+	float: left;
+	width: 60%;
+	height: 50%;
+	border: solid 1px black;
+	margin-top: 150px;
+	margin-left: 50px;
+}
