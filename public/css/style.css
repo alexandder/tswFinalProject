@@ -1,5 +1,20 @@
-div {
-	width: 100px;
-	height: 100px;
-	background-color: #132fa8;
+#loginForm {
+	float: right;
+	margin-right: 100px;
+	margin-top: 50px;
+	border: solid 1px black;
+}
+
+#logoutForm {
+	float: right;
+	margin-right: 100px;
+	margin-top: 50px;
+	border: solid 1px black;
+}
+
+#userList {
+	float: left;
+	margin-top: 100px;
+	margin-left: 50px;
+	border: solid 1px black;
 }
