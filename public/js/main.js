@@ -12,12 +12,15 @@ app.controller('appController', ['$scope', 'socket',
 	$scope.gameStarted = false;
 	$scope.question = "";
 	$scope.userAnswer = "";
+	$scope.correctAnswer = "";
+	$scope.questionAnswered = false;
 
 
 	$scope.login = function () {
 		if ($scope.username !== null) {
 			$scope.connected = true;
-			socket.emit('login', $scope.username);
+
+			socket.emit('login', {username: $scope.username, sockedId: socket.socket.sessionid, score: 0});
 		}
 	};
 
@@ -27,16 +30,34 @@ app.controller('appController', ['$scope', 'socket',
 	};
 
 	$scope.startGame = function () {
-		$scope.gameStarted = true;
 		socket.emit('startGame');
 		$scope.digest;
 	};
 
 	$scope.tryAnswer = function () {
-
+		$('#answerButton').attr('disabled', 'disabled');
+		socket.emit('tryAnswer', $scope.userAnswer);
 	};
+
+	socket.on('authenticate', function (data) {
+
+	});
+
 	socket.on('updateUserList', function (data) {
 		$scope.users = data;
 		$scope.$digest();
 	});
+
+	socket.on('giveQuestion', function (data) {
+		$scope.gameStarted = true;
+		$scope.question = data.question;
+		$scope.$digest();
+	});
+
+	socket.on('giveAnswer', function (data) {
+		$scope.correctAnswer = data;
+		$scope.questionAnswered = true;
+		$scope.$digest();
+	});
+
 }]);

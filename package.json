@@ -27,6 +27,12 @@
     "socket.io": "^0.9.16",
     "underscore": "~1.6.0",
     "grunt-contrib-less": "^0.11.0",
-    "grunt-contrib-watch": "^0.6.1"
+    "grunt-contrib-watch": "^0.6.1",
+    "connect": "^2.14.5",
+    "ejs": "*",
+    "passport": "^0.2.0",
+    "passport-local": "^1.0.0",
+    "passport.socketio": "^3.0.1",
+    "mongodb": "*"
   }
 }

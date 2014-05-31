@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <script src="/socket.io/socket.io.js"></script>
+<script src="jquery/dist/jquery.min.js"></script>
+<script src="js/main.js"></script>
+<link rel="stylesheet" href="css/styl.css">
+  </head>
+  <body>
+   Register or <a href='/login'>Log in</a><br>
+   <form method='post'>
+   <table>
+  <tr>
+    <td>Login:</td><td><input type='text' name='username'></td>
+  </tr>
+  <tr>
+    <td>Password:</td><td><input type='password' name='password'></td>
+  </tr>
+   <tr>
+    <td>Repeat password:</td><td><input type='password' name='password2'></td>
+  </tr>
+</table>
+<input type='submit' value='Zarejerstruj' />
+</form>
+  </body>
+</html>
