@@ -14,15 +14,8 @@ app.controller('appController', ['$scope', 'socket',
 	$scope.userAnswer = "";
 	$scope.correctAnswer = "";
 	$scope.questionAnswered = false;
+	$scope.connected = true;
 
-
-	$scope.login = function () {
-		if ($scope.username !== null) {
-			$scope.connected = true;
-
-			socket.emit('login', {username: $scope.username, sockedId: socket.socket.sessionid, score: 0});
-		}
-	};
 
 	$scope.logout = function () {
 		$scope.connected = false;
@@ -38,6 +31,10 @@ app.controller('appController', ['$scope', 'socket',
 		$('#answerButton').attr('disabled', 'disabled');
 		socket.emit('tryAnswer', $scope.userAnswer);
 	};
+
+	socket.on('connect', function (users) {
+		$scope.users = users;
+	});
 
 	socket.on('authenticate', function (data) {
 

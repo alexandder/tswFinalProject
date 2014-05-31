@@ -6,13 +6,20 @@
   <title><%= title %></title>
   <script src="/socket.io/socket.io.js"></script>
   <script src="jquery/dist/jquery.min.js"></script>
-  <script src="js/main.js"></script>
-  <link rel="stylesheet" href="css/styl.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.min.css" >
 </head>
 <body>
 Log in or <a href='/register'>Register</a>
 <br>
-<form method='post'>
+<br>
+  <div>
+    <%= successMsg %>
+    <%= errorMsg %>
+  </div>
+<br>
+<br>
+<form method='post' action='/login'>
 <table>
   <tr>
     <td>Login:</td><td><input type='text' name='username' /></td>

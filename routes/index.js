@@ -8,7 +8,8 @@ exports.index = function (req, res) {
 exports.register = function (req, res) {
     if (!req.user)
         res.render('register', {
-            title: 'Register'
+            title: 'Register',
+            errorMsg: ''
         });
     else
         res.redirect('/game');
@@ -16,7 +17,9 @@ exports.register = function (req, res) {
 
 exports.login = function (req, res) {
     res.render('login', {
-        title: 'Log in'
+        title: 'Log in',
+        successMsg: '',
+        errorMsg: ''
     });
 };
 
