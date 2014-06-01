@@ -1,29 +1,38 @@
-#loginForm {
-	float: right;
-	margin-right: 100px;
-	margin-top: 50px;
-	border: solid 1px black;
-}
-
 #logoutForm {
-	float: right;
-	margin-right: 100px;
-	margin-top: 50px;
-	border: solid 1px black;
+  width: 200px;
+  height: 100px;
+  float: right;
+  border: solid 1px black;
+  margin-right: 100px;
+  margin-top: 50px;
 }
-
 #userList {
-	float: left;
-	margin-top: 100px;
-	margin-left: 50px;
-	border: solid 1px black;
+  width: 20%;
+  height: 300px;
+  float: left;
+  border: solid 1px black;
+  margin-top: 150px;
+  margin-left: 50px;
 }
-
 #gameBox {
-	float: left;
-	width: 60%;
-	height: 50%;
-	border: solid 1px black;
-	margin-top: 150px;
-	margin-left: 50px;
+  width: 50%;
+  height: 400px;
+  float: left;
+  border: solid 1px black;
+  margin-top: 150px;
+  margin-left: 50px;
+}
+#dataDiv {
+  width: 200px;
+  height: 30%;
+  float: right;
+  border: solid 1px black;
+  margin-right: 100px;
+}
+#startButtonDiv {
+  margin-left: 40%;
+  margin-right: 50%;
+}
+#questionBox {
+  margin-left: 40%;
 }

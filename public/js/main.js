@@ -5,55 +5,76 @@ app.factory('socket', function () {
 	return socket;
 });
 
+app.controller('dataController', ['$scope', 'socket', function(){
+	
+}]);
+
 app.controller('appController', ['$scope', 'socket', 
 	function ($scope, socket) {
 	
 	$scope.users = [];	
 	$scope.gameStarted = false;
 	$scope.question = "";
-	$scope.userAnswer = "";
+	$scope.currentUserAnswer = "";
 	$scope.correctAnswer = "";
 	$scope.questionAnswered = false;
 	$scope.connected = true;
-
-
-	$scope.logout = function () {
-		$scope.connected = false;
-		socket.emit('logout', $scope.username);
-	};
+	$scope.userWhoAnswered = "";
+	$scope.currentUser = $('#logoutForm h4 b').text();
+	$scope.proposedAnswer = "";
+	$scope.dots = "";
+	$scope.afterAnswer = false;
 
 	$scope.startGame = function () {
 		socket.emit('startGame');
-		$scope.digest;
 	};
 
 	$scope.tryAnswer = function () {
-		$('#answerButton').attr('disabled', 'disabled');
-		socket.emit('tryAnswer', $scope.userAnswer);
+		socket.emit('tryAnswer', $scope.currentUserAnswer, $scope.currentUser);
 	};
 
-	socket.on('connect', function (users) {
-		$scope.users = users;
-	});
+	$scope.nextQuestion = function () {
+		socket.emit('nextQuestion');
+	};
 
-	socket.on('authenticate', function (data) {
-
-	});
-
-	socket.on('updateUserList', function (data) {
-		$scope.users = data;
-		$scope.$digest();
-	});
-
-	socket.on('giveQuestion', function (data) {
+	socket.on('gameStarted', function() {
 		$scope.gameStarted = true;
-		$scope.question = data.question;
+	});
+
+	socket.on('giveQuestion', function (question) {
+		$scope.currentUserAnswer = "";
+		$scope.correctAnswer = "";
+		$scope.userWhoAnswered = "";
+		$scope.proposedAnswer = "";
+		$scope.dots = "";
+		$scope.question = question;
+		$scope.questionAnswered = false;
+		$scope.afterAnswer = false;
 		$scope.$digest();
 	});
 
-	socket.on('giveAnswer', function (data) {
-		$scope.correctAnswer = data;
+	socket.on('proposedAnswer', function (user, proposedAnswer) {
+		$scope.userWhoAnswered = user;
+		$scope.proposedAnswer = proposedAnswer;
 		$scope.questionAnswered = true;
+		$scope.$digest();
+	});
+
+	socket.on('updateUserList', function (users, currentQuestion, gameStarted) {
+		$scope.users = users;
+		$scope.question = currentQuestion;
+		$scope.gameStarted = gameStarted;
+		$scope.$digest();
+	});
+
+	socket.on('giveDots', function (dots) {
+		$scope.dots = dots;
+		$scope.$digest();
+	});
+
+	socket.on('correctAnswer', function (correctAnswer) {
+		$scope.correctAnswer = correctAnswer;
+		$scope.afterAnswer = true;
 		$scope.$digest();
 	});
 

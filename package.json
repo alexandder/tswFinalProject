@@ -26,6 +26,7 @@
     "express": "3.x",
     "socket.io": "^0.9.16",
     "underscore": "~1.6.0",
+    "less-middleware": "0.1.x",
     "grunt-contrib-less": "^0.11.0",
     "grunt-contrib-watch": "^0.6.1",
     "connect": "^2.14.5",

@@ -82,8 +82,11 @@ app.get('/game', routes.game);
 app.get('/login', routes.login);
 app.get('/', routes.index);
 app.get('/logout', function (req, res) {
+    users = removeByUsername(users, req.user.username);
     req.logout();
-    users = removeByUsername(users, req.username);
+    console.log("logout: ")
+	console.log(users);
+	io.sockets.emit('updateUserList', users);
     res.redirect('/login');
 });
 
@@ -92,7 +95,6 @@ app.post('/login',
         failureRedirect: '/login'
     }),
     function (req, res) {
-    	console.log("login success");
         res.redirect('/game');
     }
 );
@@ -150,10 +152,14 @@ io.set('authorization', passportSocketIo.authorize({
     fail: onAuthorizeFail
 }));
 
+io.set('log level', 0);
+
 var users = [];
 
-
-
+var currentQuestion = {question: "",
+				answer: ""
+	};
+var gameStarted = false;
 
 var questions = [
 	{
@@ -179,49 +185,67 @@ var questions = [
 ];
 
 io.sockets.on('connection', function (socket) {
-	socket.emit('connect', users);
-	socket.on('login', function (data) {
-		var user = data;
-		users.push(user);
-		console.log(socket);
-		console.log(user.sessionid);
-		console.log(users);
-		io.sockets.emit('updateUserList', users);
-	});
+	io.sockets.emit('updateUserList', users, currentQuestion.question, gameStarted);
 
 	socket.on('disconnect', function () {
-		users = _.without(users, socket);
+		console.log("disconnect: ")
 		console.log(users);
-		io.sockets.emit('updateUserList', users);
-	});
-
-	socket.on('logout', function (user) {
-		var i = users.indexOf(socket);
-		console.log(users);
-		io.sockets.emit('updateUserList', users);
+		//io.sockets.emit('updateUserList', users);
 	});
 
 	socket.on('startGame', function() {
-		console.log('Game started!');
-		var question = questions[Math.floor(Math.random()*questions.length)];
-		io.sockets.emit('giveQuestion', question);
+		console.log(socket);
+		io.sockets.emit('gameStarted');
+		gameStarted = true;
+		currentQuestion = questions[Math.floor(Math.random()*questions.length)];
+		questions = removeQuestion(questions, currentQuestion.question);
+		io.sockets.emit('giveQuestion', currentQuestion.question);
 	});
 
-	socket.on('tryAnswer', function (answer) {
+	socket.on('nextQuestion', function() {
+		if (questions.length === 0) {
+			io.sockets.emit('end');
+		}
+		else {
+			currentQuestion = questions[Math.floor(Math.random()*questions.length)];
+			questions = removeQuestion(questions, currentQuestion.question);
+			console.log(questions);
+			io.sockets.emit('giveQuestion', currentQuestion.question);
+		}		
+	});
 
+	socket.on('tryAnswer', function (answer, user) {
+		io.sockets.emit('proposedAnswer', user, answer);
+		var isCorrect = true;
+		if (answer !== currentQuestion.answer) {
+			isCorrect = false;
+		}
+		setTimeout(function () {
+			io.sockets.emit('giveDots', '.')
+			}, 1500);
+		setTimeout(function () {
+			io.sockets.emit('giveDots', '..')
+			}, 3000);
+		setTimeout(function () {
+			io.sockets.emit('giveDots', '...')
+			}, 4500);
+		setTimeout(function () {
+			io.sockets.emit('correctAnswer', currentQuestion.answer, isCorrect);
+			}, 6000);
 	});
 });
 
 
 var removeByUsername = function(arr, username) {
-	var i = arr.length;
-    while(i--){
-       if(arr[i] && arr[i].hasOwnProperty(username) && (arguments.length > 2 && arr[i][username] === username )){
-           arr.splice(i,1);
-           return arr;
-       }
-    }
-    return arr;
+	return _.reject(arr, function (el) {
+		return el.username === username;
+	});
+}
+
+var removeQuestion = function(arr, question) {
+	return _.reject(arr, function (el) {
+		return el.question === question;
+	});
 }
 
 httpServer.listen(3000, function() {
