@@ -1,25 +1,23 @@
 var _ = require('underscore');
-var removeByUsername = function(arr, username) {
-	var i = arr.length;
-    while(i--){
-       if(arr[i] && arr[i].hasOwnProperty(username) && arr[i][username] === username ) {
-           arr.splice(i,1);
-           return arr;
-       }
-    }
-    return arr;
-}
+var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+var mongo = require('mongodb');
 
-users= [];
-users.push({"username" : "test1", "password" : "123"});
-users.push({"username" : "test2", "password" : "124"});
+var db = new mongo.Db('tswProject', new mongo.Server('localhost', 27017), {safe: true});
 
-users = removeByUsername(users, "test1");
+db.open(function (err) {
+	db.collection("omdb", function (error, coll) {
+		var xhr = new XMLHttpRequest();
+		var t = "The Social Network";
+		xhr.open("GET", "http://www.omdbapi.com/?t=" + t, false);
+		xhr.send(null);
+		var omdbData = xhr.responseText;
+		var omdbJSON = eval("(" + omdbData + ")");
+		console.log(omdbJSON.Title);
+		console.log(omdbJSON.Director);
+		/*coll.insert(omdbJSON, function (err, res) {
+			console.log(res);
 
-console.log(users);
-
-users = _.reject(users, function (el) {
-	return el.username === "test1";
+		});*/
+	});
+	db.close();
 });
-
-console.log(users);
