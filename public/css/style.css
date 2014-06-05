@@ -15,14 +15,21 @@
   margin-left: 10px;
 }
 #gameBox {
-  width: 45%;
+  width: 50%;
   height: 400px;
   float: left;
   border: solid 0px #000000;
   margin-top: 50px;
   margin-left: 100px;
 }
-#dataDiv {
+#filmDiv {
+  width: 200px;
+  height: 20%;
+  float: right;
+  border: solid 1px #000000;
+  margin-right: 100px;
+}
+#uploadDiv {
   width: 200px;
   height: 20%;
   float: right;
@@ -49,4 +56,16 @@
 }
 .wrong {
   background-color: CC1818;
+}
+.updateButton {
+  float: right;
+}
+#filmTable {
+  margin: 5px;
+  border-collapse: collapse;
+  padding: 3px 7px 2px 7px;
+  text-align: center;
+}
+#filmTable td {
+  width: 80px;
 }

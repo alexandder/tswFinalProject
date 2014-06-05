@@ -287,6 +287,7 @@ io.sockets.on('connection', function (socket) {
 			else {
 				users = changeScore(users, user, -1);
 			}
+			afterAnswer = true;
 			users = _.sortBy(users, function (el) { return -el.score; });
 			io.sockets.emit('updateUserList', users, currentQuestion.question);
 			}, 6000);

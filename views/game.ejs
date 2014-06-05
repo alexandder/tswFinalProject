@@ -37,6 +37,7 @@
 		<div id="gameBox" ng-show="connected">
 			<div ng-show="end">
 				<h3>{{endMsg}}</h3>
+			</div>
 			<div><br>
 			<div ng-hide="gameStarted">		
 				<h3>Choose quiz</h3>
@@ -52,7 +53,7 @@
 				</form> 
 			</div>
 			<div id="questionBox" ng-show="gameStarted">
-				<h2>{{toAsk}} {{currentQuestion}} ... </h2>
+				<h2>{{toAsk}} {{currentQuestion}} : </h2>
 				<div ng-show="beforeAnswer">
 					<form action="" ng-submit="tryAnswer()">
 					<input type="text" ng-model="currentUserAnswer" >
@@ -62,11 +63,10 @@
 					</form>
 				</div>
 				<div id="userAnswerDiv" ng-show="questionAnswered">
-					<p>User {{userWhoAnswered}} answers: {{proposedAnswer}}</p>
+					<h3>User {{userWhoAnswered}} answers: {{proposedAnswer}}</h3>
 				</div>
 				<div id="correctAnswerDiv" ng-show="questionAnswered">
-					<br>
-					<span>Correct answer is {{dots}}</span>
+					<h3>Correct answer is {{dots}}</h3>
 					<h3>{{correctAnswer}}</h3>
 					<br>
 				</div>
@@ -82,23 +82,24 @@
 	<div id="dataDiv" ng-controller="dataController">
 		<div id="filmDiv">
 			<h3>Film quizes</h3>
-			<table>
+			<table id="filmTable">
 				<tr>
 					<td>Directors</td>
-					<td><form action="" ng-submit="updateQuiz('Director')">
+					<td class="updateButton"><form action="" ng-submit="updateQuiz('Director')">
 						<button type="submit" class="btn btn-primary">Update</button>
 					</form></td>
 				</tr>
 				<br>
 				<tr>
 					<td>Release years</td>
-					<td><form action="" ng-submit="updateQuiz('Year')">
+					<td class="updateButton"><form action="" ng-submit="updateQuiz('Year')">
 						<button type="submit" class="btn btn-primary">Update</button>
 					</form></td>
 				</tr>
 			</table>
 			<span id="updateMsg">{{msg}}</span>
 		</div>
+		<br>
 		<br>
 		<div id="uploadDiv">
 			<h3>Upload data</h3>

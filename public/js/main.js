@@ -117,6 +117,7 @@ app.controller('appController', ['$scope', 'socket',
 		else {
 			$("td").filter(function() { return $.text([this]) === userAns; }).parent().css("background-color","red");
 		}
+
 		$scope.$digest();
 	});
 
@@ -128,9 +129,7 @@ app.controller('appController', ['$scope', 'socket',
 	socket.on('end', function () {
 		$scope.endMsg = "Play again";
 		$scope.end = true;
-		$scope.quizes = [];
 		$scope.choosenQuiz = "";
-		$scope.users = [];	
 		$scope.gameStarted = false;
 		$scope.currentQuestion = "";
 		$scope.toAsk = "";
