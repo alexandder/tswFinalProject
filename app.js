@@ -3,20 +3,28 @@ var express = require("express");
 var app = express();
 var mongo = require('mongodb');
 var connect = require('connect');
-
 var passport = require('passport');
 var socketIO = require("socket.io");
 var passportSocketIo = require('passport.socketio');
 var LocalStrategy = require('passport-local').Strategy;
 var routes = require('./routes');
 var sessionStore = new connect.session.MemoryStore();
-
+var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 var sessionSecret = '123hbh321h3jHhjj123459900dsad09dad78s';
 var sessionKey = 'connect.sid';
 
 var httpServer = require("http").createServer(app);
 var io = socketIO.listen(httpServer);
 var db = new mongo.Db('tswProject', new mongo.Server('localhost', 27017), {safe: true});
+var csv = require('ya-csv');
+
+app.use(express.static("public"));
+app.use(express.static("bower_components"));
+app.use('/bower_components',  express.static(__dirname + '/bower_components'));
+
+db.open(function (err) {
+	console.log('database opened');
+});
 
 passport.serializeUser(function (user, done) {
     done(null, user);
@@ -27,35 +35,25 @@ passport.deserializeUser(function (obj, done) {
 });
 
 
-app.use(express.static("public"));
-app.use(express.static("bower_components"));
-app.use('/bower_components',  express.static(__dirname + '/bower_components'));
-
 passport.use(new LocalStrategy(
     function (username, password, done) {
-    	db.open(function (err) {
-	    	db.collection("user", function (error, coll) {
-	    		coll.findOne({"username" : username, "password": password}, function (err, result) {
-	    			if (err) {
-	    				db.close();
-	    				return done(null, false);
-	    			}
-	    			if (result) {
-	    				console.log("Udane logowanie...");
-	    				db.close();
-	    				users.push({"username": username, "score": 0});
-	           			return done(null, {
-	                		username: username,
-	                		password: password
-	            		});
-	    			}
-	    			else {
-	    				db.close();
-	    				return done(null, false);
-	    			}
-	    		});
-	    	});
-    	});        
+    	db.collection("user", function (error, coll) {
+    		coll.findOne({"username" : username, "password": password}, function (err, result) {
+    			if (err) {
+    				return done(null, false);
+    			}
+    			if (result) {
+    				users.push({"username": username, "score": 0});
+           			return done(null, {
+                		username: username,
+                		password: password
+            		});
+    			}
+    			else {
+    				return done(null, false);
+    			}
+    		});
+    	});
     }
 ));
 
@@ -69,7 +67,12 @@ app.use(express.session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-//Konfiguracja expressa
+app.configure(function(){
+    app.use(express.methodOverride());
+    app.use(express.multipart());
+   });
+
+
 app.use(express.static("public"));
 app.use(express.static("bower_components"));
 app.set('views', __dirname + '/views');
@@ -84,8 +87,6 @@ app.get('/', routes.index);
 app.get('/logout', function (req, res) {
     users = removeByUsername(users, req.user.username);
     req.logout();
-    console.log("logout: ")
-	console.log(users);
 	io.sockets.emit('updateUserList', users);
     res.redirect('/login');
 });
@@ -100,37 +101,70 @@ app.post('/login',
 );
 
 app.post('/register', function (req, res) {
-	console.log("register try");
 	if (req.body.password !== '' && req.body.password === req.body.password2) {
-		db.open(function (err) {
+		
 			db.collection('user', function (error, coll) {
 				if (error) {
-					db.close();
 					console.log("error with collection");
 				}
 				else {
 					coll.insert({"username" : req.body.username, "password" : req.body.password}, function (err) {
 						if (err) {
 							console.log("error with insert");
-							db.close();
 						}
 						else {
-							db.close();
 							res.redirect('/login', {successMsg: "Account succesfully added!"});
 						}		
 					});
 				}
 			});
- 		});
+ 		
  	}
   	else {
  	 	res.redirect('/register', {errorMsg: "Invalid data. Try again."});
   	}        
 });
 
+app.post('/game', function (req, res) {
+	var reader = csv.createCsvFileReader(req.files.dataFile.path, {
+		'separator' : ';',
+		'comment' : ''
+	});
+	var title = req.body.title;
+	var quest = req.body.question;
+	console.log(req.body);
+	db.collection(title, function (error, coll) {
+		coll.drop(function (error, reply) {
+		});
+	});
+	db.collection(title, function (error, coll) {
+		coll.insert({"toAsk": quest}, function (err, result) {
+
+		});
+	});
+	reader.addListener('data', function (data) {
+		db.collection(title, function (error, coll) {
+			coll.insert({"question": data[0], "answer" : data[1]}, function (err, result) {
+
+			});
+		});
+	});
+	res.redirect('/game');
+	quizes = [];
+	db.collectionNames(function (err, replies) {
+		_.each(replies, function (doc) {
+			var cname = doc.name;
+			cname = cname.replace("tswProject.", "");
+			if (cname !== "user" && cname !== "system.indexes") {
+				quizes.push(cname);
+			}
+		});
+	});
+	io.sockets.emit('updateQuizList', quizes);
+});
+
 
 var onAuthorizeSuccess = function (data, accept) {
-    console.log('Udane połączenie z socket.io');
     accept(null, true);
 };
 
@@ -152,54 +186,59 @@ io.set('authorization', passportSocketIo.authorize({
     fail: onAuthorizeFail
 }));
 
-io.set('log level', 0);
+io.set("log level", 0);
 
 var users = [];
 
 var currentQuestion = {question: "",
 				answer: ""
 	};
-var gameStarted = false;
+var toAsk = "";
+var questions = [];
 
-var questions = [
-	{
-		question: "France",
-		answer: "Paris"
-	},
-	{
-		question: "USA",
-		answer: "Washington"
-	},
-	{
-		question: "Poland",
-		answer: "Warsaw"
-	},
-	{
-		question: "Germany",
-		answer: "Berlin"
-	},
-	{
-		question: "Italy",
-		answer: "Rome"
-	}
-];
+var connected;
+var gameStarted = false;
+var beforeAnswer = false;
+var questionAnswered = false;
+var afterAnswer = false;
+var quizes = [];
 
 io.sockets.on('connection', function (socket) {
-	io.sockets.emit('updateUserList', users, currentQuestion.question, gameStarted);
+
+	db.collectionNames(function (err, replies) {
+		_.each(replies, function (doc) {
+			var cname = doc.name;
+			cname = cname.replace("tswProject.", "");
+			if (cname !== "user" && cname !== "system.indexes") {
+				quizes.push(cname);
+			}
+		});
+		io.sockets.emit('updateView', users, currentQuestion.question, gameStarted, beforeAnswer, questionAnswered, afterAnswer, quizes);
+	});
+	
+	
 
 	socket.on('disconnect', function () {
-		console.log("disconnect: ")
-		console.log(users);
 		//io.sockets.emit('updateUserList', users);
 	});
 
-	socket.on('startGame', function() {
-		console.log(socket);
-		io.sockets.emit('gameStarted');
+	socket.on('startGame', function (choosenQuiz) {
 		gameStarted = true;
-		currentQuestion = questions[Math.floor(Math.random()*questions.length)];
-		questions = removeQuestion(questions, currentQuestion.question);
-		io.sockets.emit('giveQuestion', currentQuestion.question);
+		beforeAnswer = true;
+		questions = [];
+		db.collection(choosenQuiz, function (err, coll) {
+			coll.find().toArray(function (error, docs) {
+				toAsk = docs[0].toAsk;
+				console.log(toAsk);
+				for (var i = 1; i < docs.length; i++) {
+					questions.push(docs[i]);
+				}
+				io.sockets.emit('gameStarted', toAsk);
+				currentQuestion = questions[Math.floor(Math.random()*questions.length)];
+				questions = removeQuestion(questions, currentQuestion.question);
+				io.sockets.emit('giveQuestion', currentQuestion.question, beforeAnswer);
+			});	
+		});
 	});
 
 	socket.on('nextQuestion', function() {
@@ -209,32 +248,99 @@ io.sockets.on('connection', function (socket) {
 		else {
 			currentQuestion = questions[Math.floor(Math.random()*questions.length)];
 			questions = removeQuestion(questions, currentQuestion.question);
-			console.log(questions);
 			io.sockets.emit('giveQuestion', currentQuestion.question);
 		}		
 	});
 
 	socket.on('tryAnswer', function (answer, user) {
-		io.sockets.emit('proposedAnswer', user, answer);
+		beforeAnswer = false;
+		io.sockets.emit('proposedAnswer', user, answer, beforeAnswer);
 		var isCorrect = true;
 		if (answer !== currentQuestion.answer) {
 			isCorrect = false;
 		}
 		setTimeout(function () {
 			io.sockets.emit('giveDots', '.')
-			}, 1500);
+			}, 800);
 		setTimeout(function () {
 			io.sockets.emit('giveDots', '..')
-			}, 3000);
+			}, 1600);
 		setTimeout(function () {
 			io.sockets.emit('giveDots', '...')
-			}, 4500);
+			}, 2000);
 		setTimeout(function () {
 			io.sockets.emit('correctAnswer', currentQuestion.answer, isCorrect);
-			}, 6000);
+			}, 2800);
+		setTimeout(function () {
+			if (isCorrect) {
+				users = changeScore(users, user, 1)	;
+			}
+			else {
+				users = changeScore(users, user, -1);
+			}
+			io.sockets.emit('updateUserList', users);
+			}, 4000);
+	});
+
+	socket.on('updateQuiz', function (label) {
+		console.log(label);
+		var films = ["The Social Network", "The Green Mile", "The Godfather", "Schindler's List",
+			"Se7en", "Goodfellas","A Beautiful Mind", "Once Upon a Time in America", "Apocalypse Now",
+			"The Departed"];
+		db.collection(label, function (err, coll) {
+			if (coll) {
+				coll.drop(function (error, res) {
+				});
+			}
+		});
+		var filmQuestion = "Release year of "
+		if (label === "Director") {
+			filmQuestion = "Director of";
+		}
+		db.collection(label, function (err, coll) {
+			coll.insert({"toAsk" : filmQuestion}, function (error, res) {
+			});
+		});
+		var xhr = new XMLHttpRequest();
+		_.each(films, function (film) {
+			xhr.open("GET", "http://www.omdbapi.com/?t=" + film, false);
+			xhr.send(null);
+			var omdbData = xhr.responseText;
+			var omdbJSON = eval("(" + omdbData + ")");	
+			db.collection(label, function (err, coll) {
+				if (label === "Director") {
+					coll.insert({"question" : omdbJSON.Title, "answer" : omdbJSON.Director}, function (error, res) {
+					});
+				}
+				else if (label === "Year") {
+					coll.insert({"question" : omdbJSON.Title, "answer" : omdbJSON.Year}, function (error, res) {
+					});
+				}
+			});
+		});
+		io.sockets.emit("updateMsg", "succesful update");
+		quizes = [];
+		db.collectionNames(function (err, replies) {
+			_.each(replies, function (doc) {
+				var cname = doc.name;
+				cname = cname.replace("tswProject.", "");
+				if (cname !== "user" && cname !== "system.indexes") {
+					quizes.push(cname);
+				}
+			});
+			io.sockets.emit('updateView', users, currentQuestion.question, gameStarted, questionAnswered, afterAnswer, quizes);
+		});
 	});
 });
 
+
+var changeScore = function (arr, username, points) {
+	return _.each(arr, function (el) {
+		if (el.username === username) {
+			el.score = el.score + points;
+		}
+	});
+}
 
 var removeByUsername = function(arr, username) {
 	return _.reject(arr, function (el) {
