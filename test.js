@@ -11,12 +11,14 @@ db.open(function (err) {
 		xhr.open("GET", "http://www.omdbapi.com/?t=" + t, false);
 		xhr.send(null);
 		var omdbData = xhr.responseText;
-		var omdbJSON = eval("(" + omdbData + ")");
+		var omdbJSON = JSON.parse(omdbData);
 		console.log(omdbJSON.Title);
 		console.log(omdbJSON.Director);
 		/*coll.insert(omdbJSON, function (err, res) {
 			console.log(res);
-
+		var omdbJSON = eval("(" + omdbData + ")");
+		console.log(omdbJSON.Title);
+		console.log(omdbJSON.Director);
 		});*/
 	});
 	db.close();

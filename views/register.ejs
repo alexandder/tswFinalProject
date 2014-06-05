@@ -3,28 +3,36 @@
   <head>
     <title><%= title %></title>
     <script src="/socket.io/socket.io.js"></script>
-<script src="jquery/dist/jquery.min.js"></script>
-<link rel="stylesheet" href="css/style.css">
-<link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.min.css" >
+    <script src="jquery/dist/jquery.min.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.min.css" >
   </head>
   <body>
-   Register or <a href='/login'>Log in</a><br>
-   <form method='post' action='/register'>
-   <table>
-  <tr>
-    <td>Login:</td><td><input type='text' name='username'></td>
-  </tr>
-  <tr>
-    <td>Password:</td><td><input type='password' name='password'></td>
-  </tr>
-   <tr>
-    <td>Repeat password:</td><td><input type='password' name='password2'></td>
-  </tr>
-</table>
-<input type='submit' value='Zarejerstruj' />
-</form>
-  <div>
-    <%= errorMsg ? errorMsg : '' %>
-  </div>
+
+    <div id="loginDiv">
+      <form method="post" action="/register" role="form">
+        <div class="form-group">
+          <label for="username">Login</label>
+          <input type="text" class="form-control" id="loginInput" name="username">
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" class="form-control" id="password1Input" name="password">
+        </div>
+        <div class="form-group">
+          <label for="password2">Password</label>
+          <input type="password" class="form-control" id="password2Input" name="password2">
+        </div>
+        <button type="submit" class="btn btn-default">Register</button>
+      </form>
+      <br>
+      <a href='/login' class="btn btn-info">Go back to log in</a><br>
+    </div>
+
+
+    <div>
+      <%= errorMsg ? errorMsg : '' %>
+    </div>
+
   </body>
 </html>

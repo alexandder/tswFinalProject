@@ -35,6 +35,9 @@
 		</div>
 
 		<div id="gameBox" ng-show="connected">
+			<div ng-show="end">
+				<h3>{{endMsg}}</h3>
+			<div><br>
 			<div ng-hide="gameStarted">		
 				<h3>Choose quiz</h3>
 				<select ng-model="choosenQuiz" ng-options="quiz as quiz for quiz in quizes">
@@ -49,10 +52,11 @@
 				</form> 
 			</div>
 			<div id="questionBox" ng-show="gameStarted">
-				<h2>{{toAsk}} {{question}} ... </h2>
-				<div ng-hide="beforeAnswer">
+				<h2>{{toAsk}} {{currentQuestion}} ... </h2>
+				<div ng-show="beforeAnswer">
 					<form action="" ng-submit="tryAnswer()">
 					<input type="text" ng-model="currentUserAnswer" >
+					<br>
 					<br>
 					<button type="submit" id="answerButton" class="btn btn-primary">Answer!</button>
 					</form>
@@ -76,7 +80,7 @@
 		</div>
 	</div>
 	<div id="dataDiv" ng-controller="dataController">
-		<div>
+		<div id="filmDiv">
 			<h3>Film quizes</h3>
 			<table>
 				<tr>
@@ -85,6 +89,7 @@
 						<button type="submit" class="btn btn-primary">Update</button>
 					</form></td>
 				</tr>
+				<br>
 				<tr>
 					<td>Release years</td>
 					<td><form action="" ng-submit="updateQuiz('Year')">
@@ -92,10 +97,10 @@
 					</form></td>
 				</tr>
 			</table>
-			<p>{{msg}}</p>
+			<span id="updateMsg">{{msg}}</span>
 		</div>
-
-		<div>
+		<br>
+		<div id="uploadDiv">
 			<h3>Upload data</h3>
 			<form action="/game" method="post" enctype="multipart/form-data">
 				Give a title: <input type="text" name="title" ><br>

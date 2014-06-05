@@ -1,32 +1,36 @@
 
-.rectangle(@width, @height, @float) {
+.defaultBorder(@size, @color) {
+	border: solid @size @color;
+}
+
+.rectangle(@width, @height, @float, @borderSize) {
 	width: @width;
 	height: @height;
 	float: @float;
-	border: solid 1px black;
+	.defaultBorder(@borderSize, black)
 }
 
 
 #logoutForm {
-	.rectangle(200px, 100px, right);
+	.rectangle(200px, 100px, right, 0px);
 	margin-right: 100px;
-	margin-top: 50px;
+	margin-top: 20px;
 }
 
 #userList {
-	.rectangle(20%, 300px, left);
-	margin-top: 150px;
-	margin-left: 50px;
+	.rectangle(15%, 300px, left, 0px);
+	margin-top: 120px;
+	margin-left: 10px;
 }
 
 #gameBox {
-	.rectangle(50%, 400px, left);
-	margin-top: 150px;
-	margin-left: 50px;
+	.rectangle(45%, 400px, left, 0px);
+	margin-top: 50px;
+	margin-left: 100px;
 }
 
 #dataDiv {
-	.rectangle(200px, 30%, right);
+	.rectangle(200px, 20%, right, 1px);
 	margin-right: 100px;
 }
 
@@ -36,9 +40,24 @@
 }
 
 #questionBox {
-	margin-left:40%;
+	margin-left: 20%;
 }
 
 #loginDiv {
+	height: 300px;
+	width: 400px;
 	margin-left: 40%;
+}
+
+#updateMsg {
+	color: green;
+}
+
+.correct {
+	background-color: 28F016;
+
+}
+
+.wrong {
+	background-color: CC1818;
 }
